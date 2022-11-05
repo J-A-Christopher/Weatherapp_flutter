@@ -1,7 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-
-import 'package:country_state_city_picker/country_state_city_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:weather_icons/weather_icons.dart';
@@ -9,9 +7,9 @@ import 'package:weather_icons/weather_icons.dart';
 
 import 'models/album.dart';
 
-Future<Album> fetchAlbum({required String city}) async {
+Future<Album> fetchAlbum({required String place}) async {
   final response = await http.get(Uri.parse(
-      'https://api.openweathermap.org/data/2.5/weather?q=$city&appid=c82fbc1927df5fc43c67dcd6beb95e7f&units=metric'));
+      'https://api.openweathermap.org/data/2.5/weather?q=$place&appid=c82fbc1927df5fc43c67dcd6beb95e7f&units=metric'));
 
   if (response.statusCode == 200) {
     return Album.fromJson(jsonDecode(response.body));
@@ -29,14 +27,40 @@ class MyWeather extends StatefulWidget {
 
 class _MyWeatherState extends State<MyWeather> {
   late Future<Album> futureAlbum;
-  late String cityValue;
-  late String countryValue;
-  late String stateValue;
+
+  late TextEditingController region;
+  String place = '';
+
+  Future<String?> openDialog() => showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+            content: TextField(
+              controller: region,
+              autofocus: true,
+              decoration: const InputDecoration(
+                filled: true,
+                fillColor: Colors.white,
+                hintText: 'Add a City',
+              ),
+            ),
+            actions: [
+              TextButton(
+                  onPressed: () => {
+                        setState(() {
+                          futureAlbum = fetchAlbum(place: region.text);
+                        }),
+                        Navigator.of(context).pop(region.text),
+                        region.clear()
+                      },
+                  child: const Text('Add'))
+            ],
+          ));
 
   @override
   void initState() {
     super.initState();
-    futureAlbum = fetchAlbum(city: 'mombasa');
+    region = TextEditingController();
+    futureAlbum = fetchAlbum(place: 'Mombasa');
   }
 
   @override
@@ -53,33 +77,38 @@ class _MyWeatherState extends State<MyWeather> {
                 height: 40,
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 30),
-                decoration: const BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.all(Radius.circular(20))),
-                child: SelectState(
-                  onCityChanged: (city) async => setState(() {
-                    cityValue = city;
-                    futureAlbum = fetchAlbum(city: city);
-                  }),
-                  onCountryChanged: (value) {
-                    setState(() {
-                      countryValue = value;
-                    });
-                  },
-                  onStateChanged: (value) {
-                    setState(() {
-                      stateValue = value;
-                    });
-                  },
-                ),
-              ),
-              Container(
                 margin: const EdgeInsets.fromLTRB(10, 20, 0, 20),
                 child: const Text(
                   'Today\'s Report...',
                   style: TextStyle(fontSize: 30, color: Colors.white),
                 ),
+              ),
+              Row(
+                children: [
+                  Container(
+                    margin: const EdgeInsets.only(left: 120),
+                    child: IconButton(
+                        onPressed: () async {
+                          final place = await openDialog();
+                          if (place == null || place.isEmpty) return;
+                          setState(() {
+                            this.place = place;
+                          });
+                        },
+                        icon: const Icon(
+                          Icons.add,
+                          color: Colors.white,
+                          size: 40,
+                        )),
+                  ),
+                  SizedBox(
+                    width: 100,
+                    child: Text(
+                      place,
+                      style: const TextStyle(color: Colors.white, fontSize: 20),
+                    ),
+                  ),
+                ],
               ),
               FutureBuilder<Album>(
                   future: futureAlbum,
