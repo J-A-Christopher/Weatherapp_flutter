@@ -3,9 +3,9 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:weather_icons/weather_icons.dart';
+import './models/album.dart';
 // import 'package:shared_preferences/shared_preferences.dart';
 
-import 'models/album.dart';
 
 Future<Album> fetchAlbum({required String place}) async {
   final response = await http.get(Uri.parse(
@@ -15,8 +15,10 @@ Future<Album> fetchAlbum({required String place}) async {
     return Album.fromJson(jsonDecode(response.body));
   } else {
     throw Exception('Failed to load Album');
+    
   }
 }
+
 
 class MyWeather extends StatefulWidget {
   const MyWeather({super.key});
@@ -50,7 +52,13 @@ class _MyWeatherState extends State<MyWeather> {
                           futureAlbum = fetchAlbum(place: region.text);
                         }),
                         Navigator.of(context).pop(region.text),
-                        region.clear()
+                        region.clear(),
+                        // showDialog(context: context, builder: (context){
+                        //   return const Center(child: CircularProgressIndicator(),
+                        // );
+                        // })
+                        
+
                       },
                   child: const Text('Add'))
             ],
@@ -114,6 +122,17 @@ class _MyWeatherState extends State<MyWeather> {
                   future: futureAlbum,
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
+                      String getClockInUtcPlus3Hours(int timeSinceEpochInSec){
+                    final time = DateTime.fromMillisecondsSinceEpoch(timeSinceEpochInSec*1000,isUtc: true).add(const Duration(hours: 3));
+                    return '${time.hour}:${time.second}';
+                  }
+                  var sunriseData = snapshot.data!.sys?.sunrise;
+                   var sunsetData = snapshot.data!.sys?.sunset;
+                  var sunriseConversion= getClockInUtcPlus3Hours(sunriseData!);
+                   var sunsetConversion= getClockInUtcPlus3Hours(sunsetData!);
+                  print(sunriseConversion);
+                  print(sunsetConversion);
+                  
                       return Column(
                         children: [
                           Container(
@@ -214,11 +233,53 @@ class _MyWeatherState extends State<MyWeather> {
                                       ),
                                     ),
                                   ],
+                                ),
+                                const SizedBox(
+                                  height: 30,
+                                ),
+
+                                Card(
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                                  color: const Color(0xf87878787),
+                                  child: Container(
+                                    padding: const EdgeInsets.all(16),
+                                    // margin: EdgeInsets.only(left: 20),
+                                    height: 150,
+                                    width: 280,
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                      children: [
+                                        Column(
+                                          children: [
+                                           Text('Sunrise: \n $sunriseConversion', style: const TextStyle(color: Colors.white, fontSize: 20),),
+                                           const Icon(
+                                            WeatherIcons.sunrise,
+                                            color: Colors.yellow,
+                                            size: 60,
+                                          ),
+                                          ],
+                                        ),
+                                        Column(
+                                          children: [
+                                           Text('Sunset: \n $sunsetConversion', style: const TextStyle(color: Colors.white, fontSize: 20),),
+                                           const Icon(
+                                            WeatherIcons.sunset,
+                                            color: Colors.brown,
+                                            size: 60,
+                                          ),
+                                          ],
+                                        ),
+                                        
+                                      ],
+                                    ),
+
+                                  )
                                 )
                               ],
                             ),
                           ),
                         ],
+                        
                       );
                     } else if (snapshot.hasError) {
                       return Text('${snapshot.error}');
@@ -228,6 +289,7 @@ class _MyWeatherState extends State<MyWeather> {
                     );
                   }),
             ],
+            
           ),
         ),
       ),
