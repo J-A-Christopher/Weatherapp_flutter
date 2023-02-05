@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:weather_icons/weather_icons.dart';
 import './models/album.dart';
+import './last.dart';
 // import 'package:shared_preferences/shared_preferences.dart';
 
 
@@ -13,10 +14,12 @@ Future<Album> fetchAlbum({required String place}) async {
 
   if (response.statusCode == 200) {
     return Album.fromJson(jsonDecode(response.body));
+  
   } else {
     throw Exception('Failed to load Album');
     
   }
+ 
 }
 
 
@@ -53,6 +56,9 @@ class _MyWeatherState extends State<MyWeather> {
                         }),
                         Navigator.of(context).pop(region.text),
                         region.clear(),
+                    //    const CircularProgressIndicator(
+                    //   color: Colors.white,
+                    // )
                         // showDialog(context: context, builder: (context){
                         //   return const Center(child: CircularProgressIndicator(),
                         // );
@@ -130,8 +136,6 @@ class _MyWeatherState extends State<MyWeather> {
                    var sunsetData = snapshot.data!.sys?.sunset;
                   var sunriseConversion= getClockInUtcPlus3Hours(sunriseData!);
                    var sunsetConversion= getClockInUtcPlus3Hours(sunsetData!);
-                  print(sunriseConversion);
-                  print(sunsetConversion);
                   
                       return Column(
                         children: [
@@ -282,7 +286,16 @@ class _MyWeatherState extends State<MyWeather> {
                         
                       );
                     } else if (snapshot.hasError) {
-                      return Text('${snapshot.error}');
+                      //  Navigator.push(context, MaterialPageRoute(builder:(context)=>const LastPage()));
+                      return Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: const [
+                          Icon(Icons.signal_wifi_connected_no_internet_4_rounded, color: Colors.white,size: 50,),
+                           Text('No Internet Connection !', style: TextStyle(color: Colors.white,fontSize: 25),)
+
+                        ],
+                      );
+                      
                     }
                     return const CircularProgressIndicator(
                       color: Colors.white,
