@@ -1,22 +1,23 @@
 import 'dart:async';
-import 'dart:convert';
-
+// import 'dart:convert';
+import './provider/weather_provider.dart';
+import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+// import 'package:http/http.dart' as http;
 import 'package:weather_icons/weather_icons.dart';
 import './models/album.dart';
 // import 'package:shared_preferences/shared_preferences.dart';
 
-Future<Album> fetchAlbum({required String place}) async {
-  final response = await http.get(Uri.parse(
-      'https://api.openweathermap.org/data/2.5/weather?q=$place&appid=c82fbc1927df5fc43c67dcd6beb95e7f&units=metric'));
+// Future<Album> fetchAlbum({required String place}) async {
+//   final response = await http.get(Uri.parse(
+//       'https://api.openweathermap.org/data/2.5/weather?q=$place&appid=c82fbc1927df5fc43c67dcd6beb95e7f&units=metric'));
 
-  if (response.statusCode == 200) {
-    return Album.fromJson(jsonDecode(response.body));
-  } else {
-    throw Exception('Failed to load Album');
-  }
-}
+//   if (response.statusCode == 200) {
+//     return Album.fromJson(jsonDecode(response.body));
+//   } else {
+//     throw Exception('Failed to load Album');
+//   }
+// }
 
 class MyWeather extends StatefulWidget {
   const MyWeather({super.key});
@@ -26,7 +27,7 @@ class MyWeather extends StatefulWidget {
 }
 
 class _MyWeatherState extends State<MyWeather> {
-  late Future<Album> futureAlbum;
+  // late Future<Album> futureAlbum;
 
   late TextEditingController region;
   String place = '';
@@ -47,20 +48,24 @@ class _MyWeatherState extends State<MyWeather> {
               TextButton(
                   onPressed: () => {
                         setState(() {
-                          futureAlbum = fetchAlbum(place: region.text);
+                          // futureAlbum = fetchAlbum(place: region.text);
+                          Provider.of<WeatherProvider>(context, listen: false)
+                              .fetchAlbum(place: region.text);
+                          Provider.of<WeatherProvider>(context, listen: false)
+                              .getPlace(region.text);
                         }),
                         Navigator.of(context).pop(region.text),
                         region.clear(),
-                        const CircularProgressIndicator(
-                          color: Colors.white,
-                        ),
-                        showDialog(
-                            context: context,
-                            builder: (context) {
-                              return const Center(
-                                child: CircularProgressIndicator(),
-                              );
-                            })
+                        // const CircularProgressIndicator(
+                        //   color: Colors.white,
+                        // ),
+                        // showDialog(
+                        //     context: context,
+                        //     builder: (context) {
+                        //       return const Center(
+                        //         child: CircularProgressIndicator(),
+                        //       );
+                        //     })
                       },
                   child: const Text('Add'))
             ],
@@ -70,11 +75,15 @@ class _MyWeatherState extends State<MyWeather> {
   void initState() {
     super.initState();
     region = TextEditingController();
-    futureAlbum = fetchAlbum(place: 'Mombasa');
+    // Future.delayed(Duration.zero, () {
+    //   Provider.of<WeatherProvider>(context, listen: false).fetchAlbum();
+    // });
+    // futureAlbum = fetchAlbum(place: 'Mombasa');
   }
 
   @override
   Widget build(BuildContext context) {
+    final place = Provider.of<WeatherProvider>(context, listen: false).place;
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Weather App...',
@@ -121,7 +130,8 @@ class _MyWeatherState extends State<MyWeather> {
                 ],
               ),
               FutureBuilder<Album>(
-                  future: futureAlbum,
+                  future: Provider.of<WeatherProvider>(context)
+                      .fetchAlbum(place: place),
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
                       String getClockInUtcPlus3Hours(int timeSinceEpochInSec) {
@@ -392,6 +402,11 @@ class _MyWeatherState extends State<MyWeather> {
                             style: TextStyle(color: Colors.white, fontSize: 25),
                           )
                         ],
+                      );
+                    } else if (snapshot.connectionState ==
+                        ConnectionState.waiting) {
+                      return const CircularProgressIndicator(
+                        color: Colors.white,
                       );
                     }
                     return const CircularProgressIndicator(
