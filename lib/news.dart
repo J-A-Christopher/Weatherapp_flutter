@@ -27,14 +27,14 @@ class _NewsState extends State<News> {
   // }
   // https://newsdata.io/api/1/news?apikey=pub_162711355faa3f8fc27cd7fab7f4ef0e6f57a&country=ke
 
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   Future.delayed(Duration.zero,(){
-  //     Provider.of<NewsProvider>(context, listen: false).getNewsData();
-  //   });
-  //   // getNewsData();
-  // }
+  @override
+  void initState() {
+    super.initState();
+    Future.delayed(Duration.zero, () {
+      Provider.of<NewsProvider>(context, listen: false).getNewsData();
+    });
+    // getNewsData();
+  }
 
   @override
   Widget build(BuildContext context) {

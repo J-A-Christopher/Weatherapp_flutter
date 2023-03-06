@@ -30,6 +30,7 @@ class _NewsWidgetState extends State<NewsWidget> {
               },
               child: Card(
                 // color: Colors.green,
+
                 elevation: 5,
                 child: Row(
                   children: [
@@ -40,7 +41,7 @@ class _NewsWidgetState extends State<NewsWidget> {
                               borderRadius: BorderRadius.circular(30)),
                           child: Image.network(
                             widget.news[index].urlToImage ??
-                                'https://reactnativecode.com/wp-content/uploads/2018/02/Default_Image_Thumbnail.png',
+                                'https://reactnativecode.com/wp-content/uploads/2018/02/Default_Image_Thumbnail.png,',
                             fit: BoxFit.cover,
                           )),
                     ),

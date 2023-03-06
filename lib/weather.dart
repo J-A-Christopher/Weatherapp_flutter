@@ -75,9 +75,9 @@ class _MyWeatherState extends State<MyWeather> {
   void initState() {
     super.initState();
     region = TextEditingController();
-    // Future.delayed(Duration.zero, () {
-    //   Provider.of<WeatherProvider>(context, listen: false).fetchAlbum();
-    // });
+    Future.delayed(Duration.zero, () {
+      Provider.of<WeatherProvider>(context, listen: false).fetchAlbum();
+    });
     // futureAlbum = fetchAlbum(place: 'Mombasa');
   }
 

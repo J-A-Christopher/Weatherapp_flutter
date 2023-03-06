@@ -10,6 +10,12 @@ extension extString on String {
     return nameRegExp.hasMatch(this);
   }
 
+  bool get isValidPassword {
+    final passRegExp =
+        RegExp(r"^((?=.*\d)(?=.*[a-zA-Z])[a-zA-Z0-9!@#$%&_*]{6,20})$");
+    return passRegExp.hasMatch(this);
+  }
+
   bool get isNotNull {
     return this != null;
   }
