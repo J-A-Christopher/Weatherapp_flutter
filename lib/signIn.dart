@@ -92,10 +92,9 @@ class SignIn extends StatelessWidget {
                       FloatingActionButton(
                         onPressed: () async {
                           if (formKey1.currentState!.validate()) {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                  builder: (_) => const FinalResonse()),
-                            );
+                            Navigator.of(context).pushReplacement(
+                                MaterialPageRoute(
+                                    builder: (_) => const FinalResonse()));
                           }
                         },
                         child: const Icon(Icons.arrow_forward),
