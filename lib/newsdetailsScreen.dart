@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:weather_app/models/newsModel.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:palette_generator/palette_generator.dart';
+// import 'package:intl/date_time_patterns.dart';
 
 class NewsDetailsScreen extends StatefulWidget {
   final Articles news;
@@ -24,6 +26,11 @@ class _NewsDetailsScreenState extends State<NewsDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    var date = widget.news.publishedAt;
+    DateTime dt = DateTime.parse(date!);
+    var gTime = DateFormat("EEE, d MMM yyyy HH:mm:ss").format(dt);
+    print(gTime);
+
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
@@ -44,9 +51,9 @@ class _NewsDetailsScreenState extends State<NewsDetailsScreen> {
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
                     trip = snapshot.data!.dominantColor!.color;
-                    return Text('color: ${trip.toString()}');
+                    // return Text('color: ${trip.toString()}');
                   }
-                  return Text('error');
+                  return Text('');
                 }),
             Image.network(
               widget.news.urlToImage ??
@@ -73,7 +80,7 @@ class _NewsDetailsScreenState extends State<NewsDetailsScreen> {
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: Text('Published On  : ${widget.news.publishedAt}',
+              child: Text('Published On  : ${gTime}',
                   style: const TextStyle(fontSize: 25)),
             ),
           ],

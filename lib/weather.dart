@@ -70,15 +70,25 @@ class _MyWeatherState extends State<MyWeather> {
                   child: const Text('Add'))
             ],
           ));
-
+  var _isInit = true;
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   region = TextEditingController();
+  //   Future.delayed(Duration.zero, () {
+  //     Provider.of<WeatherProvider>(context, listen: false).fetchAlbum();
+  //   });
+  //   // futureAlbum = fetchAlbum(place: 'Mombasa');
+  // }
   @override
-  void initState() {
-    super.initState();
-    region = TextEditingController();
-    Future.delayed(Duration.zero, () {
+  void didChangeDependencies() {
+    // TODO: implement didChangeDependencies
+    super.didChangeDependencies();
+    if (_isInit) {
+      region = TextEditingController();
       Provider.of<WeatherProvider>(context, listen: false).fetchAlbum();
-    });
-    // futureAlbum = fetchAlbum(place: 'Mombasa');
+    }
+    _isInit = false;
   }
 
   @override
